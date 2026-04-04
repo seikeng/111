@@ -104,7 +104,130 @@ class query_player_profile(Module):
             self._log(f"查询失败: {e}")
             raise AbortError(f"无法获取玩家 {viewer_id} 的资料")
 
+@texttype("target_viewer_id", "玩家ID", "")  
+@description('向指定玩家发送好友请求')  
+@name('加好友')  
+@default(False)  
+class add_friend(Module):  
+    async def do_task(self, client: pcrclient):  
+        viewer_id_str: str = self.get_config("target_viewer_id").strip()  
+  
+        if not viewer_id_str:  
+            raise AbortError("请输入玩家ID")  
+  
+        if not viewer_id_str.isdigit():  
+            raise AbortError("玩家ID必须是数字")  
+  
+        viewer_id: int = int(viewer_id_str)  
+  
+        if viewer_id <= 0:  
+            raise AbortError("请输入有效的玩家ID")  
+  
+        self._log(f"正在处理玩家ID: {viewer_id}")  
+  
+        try:  
+            # 先获取玩家昵称  
+            profile_data = await client.get_profile(viewer_id)  
+            if not hasattr(profile_data, 'user_info') or not profile_data.user_info:  
+                raise AbortError(f"无法获取玩家 {viewer_id} 的信息")  
+              
+            user_name = profile_data.user_info.user_name  
+  
+            # 获取当前好友列表和好友上限  
+            from ...model.models import FriendFriendListRequest  
+            friend_list_req = FriendFriendListRequest()  
+            friend_list_response = await client.request(friend_list_req)  
+              
+            # 获取好友上限配置  
+            current_friend_count = len(friend_list_response.friend_list) if friend_list_response.friend_list else 0  
+              
+            # 获取用户信息中的好友数（作为备用）  
+            if hasattr(profile_data, 'user_info') and profile_data.user_info.friend_num is not None:  
+                current_friend_count = profile_data.user_info.friend_num  
+              
+            # 好友上限检测（公主连结好友上限通常是40）  
+            FRIEND_LIMIT = 40  
+            if current_friend_count >= FRIEND_LIMIT:  
+                self._log(f"好友数量已达上限 ({current_friend_count}/{FRIEND_LIMIT})，无法添加更多好友")  
+                return  
+              
+            # 检查是否已经是好友  
+            if friend_list_response.friend_list:  
+                for friend in friend_list_response.friend_list:  
+                    if friend.viewer_id == viewer_id:  
+                        self._log(f"玩家 {user_name}(ID: {viewer_id}) 已经是您的好友")  
+                        return  
+  
+            # 发送好友请求  
+            from ...model.models import FriendRequestRequest  
+            req = FriendRequestRequest()  
+            req.target_viewer_id = viewer_id  
+            await client.request(req)  
+  
+            self._log(f"成功向玩家 {user_name}(ID: {viewer_id}) 发送好友请求")  
+  
+        except Exception as e:  
+            self._log(f"发送好友请求失败: {e}")  
+            raise AbortError(f"无法向玩家 {viewer_id} 发送好友请求")
 
+@texttype("target_viewer_id", "玩家ID", "")  
+@description('删除指定好友')  
+@name('删好友')  
+@default(False)  
+class remove_friend(Module):  
+    async def do_task(self, client: pcrclient):  
+        viewer_id_str: str = self.get_config("target_viewer_id").strip()  
+  
+        if not viewer_id_str:  
+            raise AbortError("请输入玩家ID")  
+  
+        if not viewer_id_str.isdigit():  
+            raise AbortError("玩家ID必须是数字")  
+  
+        viewer_id: int = int(viewer_id_str)  
+  
+        if viewer_id <= 0:  
+            raise AbortError("请输入有效的玩家ID")  
+  
+        self._log(f"正在处理玩家ID: {viewer_id}")  
+  
+        try:  
+            # 先获取玩家昵称  
+            profile_data = await client.get_profile(viewer_id)  
+            if not hasattr(profile_data, 'user_info') or not profile_data.user_info:  
+                raise AbortError(f"无法获取玩家 {viewer_id} 的信息")  
+              
+            user_name = profile_data.user_info.user_name  
+  
+            # 获取当前好友列表  
+            from ...model.models import FriendFriendListRequest  
+            friend_list_req = FriendFriendListRequest()  
+            friend_list_response = await client.request(friend_list_req)  
+              
+            # 检查是否是好友  
+            is_friend = False  
+            if friend_list_response.friend_list:  
+                for friend in friend_list_response.friend_list:  
+                    if friend.viewer_id == viewer_id:  
+                        is_friend = True  
+                        break  
+              
+            if not is_friend:  
+                self._log(f"玩家 {user_name}(ID: {viewer_id}) 不是您的好友")  
+                return  
+  
+            # 删除好友  
+            from ...model.models import FriendRemoveRequest  
+            req = FriendRemoveRequest()  
+            req.target_viewer_id = viewer_id  
+            await client.request(req)  
+  
+            self._log(f"成功删除好友 {user_name}(ID: {viewer_id})")  
+  
+        except Exception as e:  
+            self._log(f"删除好友失败: {e}")  
+            raise AbortError(f"无法删除好友 {viewer_id}")
+			
 @name('撤下会战助战')
 @default(True)
 @description('拒绝内鬼练度')

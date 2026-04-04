@@ -147,6 +147,8 @@ daily_modules = ModuleList(
         room_upper_all,
         music_buy_all,  # 新增  
         user_info,
+        add_friend,
+        remove_friend,
     ]
 )
 

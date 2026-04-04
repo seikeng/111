@@ -2485,6 +2485,42 @@ async def search_ex_equip_id(botev: BotEvent):
     return {  
         "search_ex_equip_name": equip_name,  
     }
+	
+@register_tool("加好友", "add_friend")
+async def add_friend(botev: BotEvent):
+    msg = await botev.message()
+    target_viewer_id = ""
+    try:
+        target_viewer_id = msg[0]
+        del msg[0]
+    except:
+        await botev.finish("请输入玩家ID")
+    
+    if not target_viewer_id.isdigit():
+        await botev.finish("玩家ID必须是数字")
+    
+    config = {
+        "target_viewer_id": target_viewer_id
+    }
+    return config
+
+@register_tool("删好友", "remove_friend")
+async def remove_friend(botev: BotEvent):
+    msg = await botev.message()
+    target_viewer_id = ""
+    try:
+        target_viewer_id = msg[0]
+        del msg[0]
+    except:
+        await botev.finish("请输入玩家ID")
+    
+    if not target_viewer_id.isdigit():
+        await botev.finish("玩家ID必须是数字")
+    
+    config = {
+        "target_viewer_id": target_viewer_id
+    }
+    return config
 # @register_tool("获取导入", "get_library_import_data")
 # async def get_library_import(botev: BotEvent):
     # return {}
