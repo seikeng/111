@@ -1,8 +1,8 @@
 from dataclasses import field
 from typing import Any
+from .abyss import *
 from .autosweep import *
 from .box import *
-from .abyss import *
 from .nologin import *
 from .caravan import *
 from .clan import *
@@ -74,18 +74,18 @@ daily_modules = ModuleList(
         explore_exp,
         explore_mana,
         underground_skip,
-        abyss_quest_sweep,
-        abyss_boss_sweep,
         special_underground_skip,
         mirage_floor_receive,
         mirage_nemesis_sweep,
         tower_cloister_sweep,
-        smart_very_hard_sweep,
         jjc_reward,
+        abyss_quest_sweep,
+        abyss_boss_sweep,
         talent_sweep,
-        hatsune_dear_reading,
         present_receive,
         talent_sweep2,
+        smart_very_hard_sweep,
+        xinsui9_sweep,
         xinsui8_sweep,
         xinsui7_sweep,
         xinsui6_sweep,
@@ -98,6 +98,7 @@ daily_modules = ModuleList(
         starcup2_sweep,
         starcup1_sweep, 
         hatsune_h_sweep,
+        hatsune_dear_reading,
         smart_sweep,
         mirai_very_hard_sweep,
         smart_hard_sweep,
@@ -131,7 +132,7 @@ daily_modules = ModuleList(
         clanbattle_shop,
         master_shop_talent,
         master_shop,
-        
+
         clan_equip_request,
         love_up,
         shiori_mission_check,
@@ -147,8 +148,6 @@ daily_modules = ModuleList(
         room_upper_all,
         music_buy_all,  # 新增  
         user_info,
-        add_friend,
-        remove_friend,
     ]
 )
 
@@ -244,8 +243,8 @@ tool_modules = ModuleList(
         half_schedule,
         caravan_play,
         caravan_shop_buy,
-        clan_battle_knive,        
-        ex_equip_info,      
+        clan_battle_knive,
+        ex_equip_info,
         travel_team_view,
         missing_emblem,
         get_clan_support_unit,
@@ -259,5 +258,7 @@ tool_modules = ModuleList(
         pjjc_info,
         pjjc_def_shuffle_team,
         pjjc_atk_shuffle_team,
+        add_friend,
+        remove_friend,
     ]
 )
